@@ -5,7 +5,11 @@
 
 package dsblock
 
-import "testing"
+import (
+    "sync"
+    "testing"
+    "time"
+)
 
 func TestBinarySearcher_Search(t *testing.T) {
     value := binarySearcher{"1", "2", "3", "4"}
@@ -28,10 +32,25 @@ func TestBinarySearcher_Search(t *testing.T) {
 
 func TestZookeeperLock_Lock(t *testing.T) {
     zl := ZookeeperLocker([]string{"127.0.0.1:2181"}, "/lock", "lock-")
-    err := zl.Lock()
-    if err != nil {
-        t.Fatalf(err.Error())
+    wg := sync.WaitGroup{}
+    for i := 0; i < 7; i ++ {
+        wg.Add(1)
+        go func() {
+            defer wg.Done()
+            err := zl.Lock()
+            if err != nil {
+                t.Errorf(err.Error())
+                return
+            }
+            time.Sleep(5 * time.Second)
+            err = zl.UnLock()
+            if err != nil {
+                t.Errorf(err.Error())
+                return
+            }
+        }()
     }
+    wg.Wait()
     zl.Close()
 }
 

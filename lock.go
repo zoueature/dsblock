@@ -7,6 +7,6 @@ package dsblock
 
 type DsbLock interface {
 	Lock() error
-	UnLock()
+	UnLock() error
 	Close()
 }

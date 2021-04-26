@@ -40,7 +40,7 @@ func (r *redisLock) Lock() error {
     panic("implement me")
 }
 
-func (r *redisLock) UnLock() {
+func (r *redisLock) UnLock() error {
     panic("implement me")
 }
 
