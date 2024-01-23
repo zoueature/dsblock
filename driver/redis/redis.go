@@ -12,10 +12,10 @@ import (
 )
 
 // NewSingleLocker 单实例的分布式锁
-func NewSingleLocker(addr string, db int) dsblock.Locker {
+func NewSingleLocker(addr, password string, db int) dsblock.Locker {
 	conn := redis.NewClient(&redis.Options{
 		Addr:     addr,
-		Password: "",
+		Password: password,
 		DB:       db,
 	})
 	return &redisLock{conn: conn}
