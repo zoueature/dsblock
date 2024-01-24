@@ -6,6 +6,7 @@
 package redis
 
 import (
+	"errors"
 	"github.com/go-redis/redis"
 	"github.com/zoueature/dsblock"
 	"time"
@@ -26,7 +27,14 @@ type redisLock struct {
 }
 
 func (r *redisLock) Lock(key string, autoUnlockTime time.Duration) error {
-	return r.conn.SetNX(key, "OK", autoUnlockTime).Err()
+	ok, err := r.conn.SetNX(key, "OK", autoUnlockTime).Result()
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return errors.New("Locked by others ")
+	}
+	return nil
 }
 
 func (r *redisLock) UnLock(key string) error {
